@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +17,8 @@ namespace UptimeTracker
             var pingSites = new List<string>
             {
                 "google.com",
-                "yahoo.com"
+                "yahoo.com",
+                "comcast.com"
             };
             var interval = 30000;
 
@@ -41,10 +43,24 @@ namespace UptimeTracker
                                 foreach (var s in pingSites)
                                 {
                                     Console.Write($"Pinging {s}");
-                                    var r = p.Send(s);
-                                    //if (r.Status != IPStatus.Success)
-                                    Console.WriteLine($"\t{r.Status}");
-                                    System.IO.File.AppendAllText(logFile, $"{DateTime.Now:s}\t{s}\t{r.Status}\r\n");
+                                    var status = "";
+                                    try
+                                    {
+                                        PingReply r = null;
+                                        r = p.Send(s, 1000);
+                                        status = IPStatus.Success.ToString();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        status = ex.Message;
+                                        var se = ex.InnerException as SocketException;
+                                        if (se != null)
+                                        {
+                                            status = se.SocketErrorCode.ToString();
+                                        }
+                                    }
+                                    Console.WriteLine($"\t{status}");
+                                    System.IO.File.AppendAllText(logFile, $"{DateTime.Now:s}\t{s}\t{status}\r\n");
                                 }
                             }
                         }
