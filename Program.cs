@@ -109,9 +109,9 @@ namespace UptimeTracker
 		{
 			var success = false;
 
-			Console.Write($"Pinging {site.Name} ({site.IPAddress?.ToString() ?? "?"})");
+			Console.Write($"Pinging {site.Name}");
 			var status = "";
-			var logAddress = default(IPAddress);
+			var logAddress = site.IPAddress;
 
 			try
 			{
@@ -119,19 +119,18 @@ namespace UptimeTracker
 				{
 					PingReply r = null;
 
-					if (site.IPAddress != null)
+					if (logAddress != null)
 					{
-						r = p.Send(site.IPAddress, 1000);
+						r = p.Send(logAddress, 1000);
 					}
 					else
 					{
-						logAddress = site.IPAddress;
 						r = p.Send(site.Name, 1000);
 					}
 
 					status = r.Status.ToString();
 					success = r.Status == IPStatus.Success;
-					if (success && site.IPAddress == null)
+					if (success && logAddress == null)
 					{
 						logAddress = site.IPAddress = r.Address;
 					}
@@ -151,7 +150,7 @@ namespace UptimeTracker
 				}
 			}
 
-			Console.WriteLine($"\t{status}");
+			Console.WriteLine($" ({logAddress?.ToString() ?? "?"})\t{status}");
 			System.IO.File.AppendAllText(logFile, $"{DateTime.Now:s}\t{site.Name} ({logAddress})\t{status}\r\n");
 
 			return success;
