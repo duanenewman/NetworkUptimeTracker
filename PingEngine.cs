@@ -8,9 +8,7 @@ namespace UptimeTracker
 {
 	public class PingEngine : IDisposable
 	{
-		public Action<string> MessageLogger { get; set; }
-		public int Interval { get; set; } = 10000;
-		public RoundRobinList<HostInfo> PingSites = new RoundRobinList<HostInfo>();
+		public PingEngineConfig Config { get; set; }
 		private CancellationTokenSource cancelSource = new CancellationTokenSource();
 
 		public void StartPinging()
@@ -22,17 +20,17 @@ namespace UptimeTracker
 			{
 				while (true)
 				{
-					var site = PingSites.GetNext();
+					var site = Config.PingSites.GetNext();
 
-					if (!CheckSite(site, MessageLogger))
+					if (!CheckSite(site, Config.MessageLogger))
 					{
-						foreach (var s in PingSites.GetAllButLast())
+						foreach (var s in Config.PingSites.GetAllButLast())
 						{
-							CheckSite(s, MessageLogger);
+							CheckSite(s, Config.MessageLogger);
 						}
 					}
 
-					await Task.Delay(Interval, cancelToken);
+					await Task.Delay(Config.Interval, cancelToken);
 				}
 			}, cancelToken);
 		}
