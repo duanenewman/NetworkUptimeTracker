@@ -8,33 +8,35 @@ using System.Text;
 
 namespace UptimeTracker
 {
-	class Program
+	internal class Program
 	{
-
-		static void Main(string[] args)
+		private static void Main(string[] args)
 		{
 			var config = PingEngineConfig.FromArgs(args);
 			if (config == null) return;
-
-			void LogMesssageAction(string s)
+			
+			config.MessageLogger = (hostInfo, pingState, status) =>
 			{
+				if (pingState == PingState.Started)
+				{
+					Console.Write($"Pinging {hostInfo.Name}");
+					return;
+				}
+
+				Console.WriteLine($" ({hostInfo.IPAddress?.ToString() ?? "?"})\t{status}");
+
 				try
 				{
-					File.AppendAllText(config.LogFile, s);
+					File.AppendAllText(config.LogFile, ($"{DateTime.Now:s}\t{hostInfo.Name} ({hostInfo.IPAddress})\t{status}\r\n"));
 				}
 				catch (Exception ex)
 				{
 					//go on with life...
 					Console.WriteLine($"Error writing to log file: {ex.Message}");
 				}
-			}
-
-			config.MessageLogger = LogMesssageAction;
-			
-			var pingEngine = new PingEngine()
-			{
-				Config = config
 			};
+			
+			var pingEngine = new PingEngine(config);
 
 			pingEngine.StartPinging();
 

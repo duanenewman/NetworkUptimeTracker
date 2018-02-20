@@ -51,6 +51,7 @@
     <Compile Include="HostInfo.cs" />
     <Compile Include="PingEngine.cs" />
     <Compile Include="PingEngineConfig.cs" />
+    <Compile Include="PingState.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoundRobinList.cs" />

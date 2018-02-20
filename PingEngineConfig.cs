@@ -20,7 +20,7 @@ namespace UptimeTracker
 			new HostInfo("comcast.com")
 		}.AsReadOnly();
 
-		public Action<string> MessageLogger { get; set; }
+		public Action<HostInfo, PingState, string> MessageLogger { get; set; }
 		public int Interval { get; set; } = 10000;
 		public string LogFile { get; set; }
 

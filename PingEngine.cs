@@ -8,12 +8,26 @@ namespace UptimeTracker
 {
 	public class PingEngine : IDisposable
 	{
-		public PingEngineConfig Config { get; set; }
-		private CancellationTokenSource cancelSource = new CancellationTokenSource();
+		public PingEngineConfig Config { get; }
+		private CancellationTokenSource cancelSource;
+
+		private readonly object startLock = new object();
+		private bool isStarted = false;
+
+		public PingEngine(PingEngineConfig config)
+		{
+			Config = config;
+		}
 
 		public void StartPinging()
 		{
+			lock (startLock)
+			{
+				if (isStarted) return;
+				isStarted = true;
+			}
 
+			cancelSource = new CancellationTokenSource();
 			var cancelToken = cancelSource.Token;
 
 			Task.Run(async () =>
@@ -37,7 +51,15 @@ namespace UptimeTracker
 
 		public void StopPinging()
 		{
+			lock (startLock)
+			{
+				if (!isStarted) return;
+			}
 			cancelSource.Cancel();
+			lock (startLock)
+			{
+				isStarted = false;
+			}
 		}
 
 		public void Dispose()
@@ -45,54 +67,52 @@ namespace UptimeTracker
 			cancelSource?.Dispose();
 		}
 
-		private static bool CheckSite(HostInfo hostInfo, Action<string> logMessage)
+		private static bool CheckSite(HostInfo hostInfo, Action<HostInfo, PingState, string> updateStatus)
 		{
 			var success = false;
 
-			Console.Write($"Pinging {hostInfo.Name}");
+			updateStatus?.Invoke(hostInfo, PingState.Started, string.Empty);
+
 			var status = "";
 			var logAddress = hostInfo.IPAddress;
-
+			var pingState = PingState.Failure;
 			try
 			{
 				using (var p = new Ping())
 				{
-					PingReply r = null;
-
-					if (logAddress != null)
-					{
-						r = p.Send(logAddress, 1000);
-					}
-					else
-					{
-						r = p.Send(hostInfo.Name, 1000);
-					}
+					var r = logAddress != null
+						? p.Send(logAddress, 1000)
+						: p.Send(hostInfo.Name, 1000);
 
 					status = r.Status.ToString();
 					success = r.Status == IPStatus.Success;
-					if (success && logAddress == null)
-					{
-						logAddress = hostInfo.IPAddress = r.Address;
-					}
 					if (!success)
 					{
 						hostInfo.IPAddress = null;
+					}
+					else
+					{
+						pingState = PingState.Success;
+						if (logAddress == null)
+						{
+							hostInfo.IPAddress = r.Address;
+						}
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				status = ex.Message;
-				var se = ex.InnerException as SocketException;
-				if (se != null)
+				if (ex.InnerException is SocketException se)
 				{
 					status = se.SocketErrorCode.ToString();
 				}
+				else
+				{
+					status = ex.Message;
+				}
 			}
 
-			Console.WriteLine($" ({logAddress?.ToString() ?? "?"})\t{status}");
-
-			logMessage($"{DateTime.Now:s}\t{hostInfo.Name} ({logAddress})\t{status}\r\n");
+			updateStatus?.Invoke(hostInfo, pingState, status);
 
 			return success;
 		}
