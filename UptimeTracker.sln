@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2002
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UptimeTracker", "UptimeTracker\UptimeTracker.csproj", "{94F0CBF7-7AE5-4E3B-B355-E200DC5A05E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UptimeTracker.Core", "UptimeTracker.Core\UptimeTracker.Core.csproj", "{211927DB-4702-4E64-8AF2-AA6CB137B639}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{94F0CBF7-7AE5-4E3B-B355-E200DC5A05E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94F0CBF7-7AE5-4E3B-B355-E200DC5A05E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94F0CBF7-7AE5-4E3B-B355-E200DC5A05E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{211927DB-4702-4E64-8AF2-AA6CB137B639}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{211927DB-4702-4E64-8AF2-AA6CB137B639}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{211927DB-4702-4E64-8AF2-AA6CB137B639}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{211927DB-4702-4E64-8AF2-AA6CB137B639}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

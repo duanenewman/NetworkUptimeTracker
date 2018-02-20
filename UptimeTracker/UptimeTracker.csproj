@@ -48,17 +48,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HostInfo.cs" />
-    <Compile Include="PingEngine.cs" />
-    <Compile Include="PingEngineConfig.cs" />
-    <Compile Include="PingState.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RoundRobinList.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UptimeTracker.Core\UptimeTracker.Core.csproj">
+      <Project>{211927db-4702-4e64-8af2-aa6cb137b639}</Project>
+      <Name>UptimeTracker.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
